@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirection Hub</title>
+  <style>
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: start;
+      height: 100vh;
+      margin-top: 4rem;
+      font-family: Arial, sans-serif;
+    }
+
+    input {
+      width: 80%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 1.2rem;
+    }
+
+    div {
+      display: flex;
+      gap: 2rem;
+    }
+
+    div > button {
+      padding: 10px 20px;
+      margin: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Redirection Hub</h1>
+    <input type="text" id="redirectUrl" readonly />
+    <div>
+      <button id="copyBtn">Copy URL</button>
+      <button id="goBtn">Go To URL</button>
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const defaultUrl = "http://localhost:8080";
+      let redirectUrl = defaultUrl;
+
+      const params = new URLSearchParams(window.location.search);
+      if (params.toString()) {
+        redirectUrl = `${defaultUrl}?${params.toString()}`;
+      }
+
+      const redirectUrlInput = document.getElementById("redirectUrl");
+      redirectUrlInput.value = redirectUrl;
+
+      document.getElementById("copyBtn").addEventListener("click", () => {
+        navigator.clipboard.writeText(redirectUrl).then(() => {
+          alert("URL copied to clipboard!");
+        });
+      });
+
+      document.getElementById("goBtn").addEventListener("click", () => {
+        window.open(redirectUrl, '_blank');
+      });
+    });
+  </script>
+</body>
+</html>
