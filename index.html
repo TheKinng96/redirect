@@ -3,60 +3,54 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <title>Redirection Hub</title>
-  <style>
-    main {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: start;
-      height: 100vh;
-      margin-top: 4rem;
-      font-family: Arial, sans-serif;
-    }
-
-    input {
-      width: 80%;
-      padding: 10px;
-      margin: 10px 0;
-      font-size: 1.2rem;
-    }
-
-    div {
-      display: flex;
-      gap: 2rem;
-    }
-
-    div > button {
-      padding: 10px 20px;
-      margin: 5px;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-  </style>
 </head>
 <body>
-  <main>
-    <h1>Redirection Hub</h1>
-    <input type="text" id="redirectUrl" readonly />
-    <div>
-      <button id="copyBtn">Copy URL</button>
-      <button id="goBtn">Go To URL</button>
+  <main class="flex flex-col items-center justify-start h-screen mt-8 font-sans px-8">
+    <h1 class="text-3xl font-bold mb-4">Redirection Hub</h1>
+    <input type="text" id="redirectUrl" class="w-full px-4 py-2 mb-4 border rounded" readonly />
+    <div class="flex gap-4 mb-6">
+      <button id="copyBtn" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">Copy URL</button>
+      <button id="goBtn" class="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">Go To URL</button>
+    </div>
+
+    <!-- default url -->
+    <div class="flex items-center gap-4 mb-4 w-full">
+      <label for="defaultUrlInput" class="text-lg">Default URL:</label>
+      <input type="text" id="defaultUrlInput" class="px-4 py-2 border rounded flex-1" placeholder="Enter default URL" />
+      <button id="saveBtn" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Save</button>
     </div>
   </main>
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      const defaultUrl = "http://localhost:8080";
-      let redirectUrl = defaultUrl;
-
-      const params = new URLSearchParams(window.location.search);
-      if (params.toString()) {
-        redirectUrl = `${defaultUrl}?${params.toString()}`;
-      }
-
+      const defaultUrlKey = 'defaultUrl';
+      const defaultUrlInput = document.getElementById("defaultUrlInput");
       const redirectUrlInput = document.getElementById("redirectUrl");
+
+      const getDefaultUrl = () => {
+        return localStorage.getItem(defaultUrlKey) || "http://localhost:8080";
+      };
+
+      let defaultUrl = getDefaultUrl();
+      const params = new URLSearchParams(window.location.search);
+      let redirectUrl = `${defaultUrl}${params.toString() ? '?' + params.toString() : ''}`;
+
+      const updateRedirectUrl = () => {
+        redirectUrl = `${defaultUrl}${params.toString() ? '?' + params.toString() : ''}`;
+        redirectUrlInput.value = redirectUrl;
+      };
+
+      defaultUrlInput.value = defaultUrl;
       redirectUrlInput.value = redirectUrl;
+
+      document.getElementById("saveBtn").addEventListener("click", () => {
+        defaultUrl = defaultUrlInput.value;
+        localStorage.setItem(defaultUrlKey, defaultUrl);
+        updateRedirectUrl();
+        alert("Default URL saved!");
+      });
 
       document.getElementById("copyBtn").addEventListener("click", () => {
         navigator.clipboard.writeText(redirectUrl).then(() => {
